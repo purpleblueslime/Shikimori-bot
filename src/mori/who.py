@@ -60,7 +60,7 @@ async def who(ctx: interactions.CommandContext, sub_command: str, query: str=Non
   bannerImage = bannerImage.filter(ImageFilter.GaussianBlur(25))
 
   coverImage = Image.open(requests.get(this.coverImage.extraLarge, stream=True).raw)
-  coverImage = ImageOps.fit(coverImage, (190,280))
+  coverImage = ImageOps.fit(coverImage, (190,280)).convert('RGB')
   bannerImage.paste(coverImage, (40,160))
 
   r, g, b = bannerImage.getpixel((400,40))
