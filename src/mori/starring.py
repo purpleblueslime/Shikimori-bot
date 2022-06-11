@@ -65,20 +65,22 @@ async def who(ctx: interactions.CommandContext, sub_command: str, query: str=Non
       actImage = Image.open(requests.get(this[itstype].e[nth].n.image.extraLarge, stream=True).raw)
       actImage = ImageOps.fit(actImage, (90,130)).convert('RGB')
 
-      r, g, b = actImage.getpixel((90/2,120))
+      r, g, b = actImage.getpixel((0,120))
       if r <= 180 and g <= 180 and b <= 180: textColor = 'white'  
       else: textColor = 'black' 
 
-      draw = ImageDraw.Draw(actImage)
-      
+      textWrap = Image.new('RGBA', (90,30), (r,g,b,180))
+      draw = ImageDraw.Draw(textWrap)
+
       title = textwrap.shorten((this[itstype].e[nth].n.title.english or  this[itstype].e[nth].n.title.romaji), width=12, placeholder='..')
       font = ImageFont.truetype('src/fonts/whitneybold.otf', 14)
-      draw.text((90/2,115), title, fill=textColor, font=font, anchor='ms')
+      draw.text((90/2,2), title, fill=textColor, font=font, anchor='ma')
 
       role = textwrap.shorten(this[itstype].e[nth].role.capitalize(), width=12, placeholder='..')
       font = ImageFont.truetype('src/fonts/whitneybold.otf', 12)
-      draw.text((90/2,125), role, fill=textColor, font=font, anchor='ms')
-
+      draw.text((90/2,14), role, fill=textColor, font=font, anchor='ma')
+      
+      actImage.paste(textWrap, (0, 100), textWrap)
       image.paste(actImage, (xAxis, yAxis))
       nth += 1
 

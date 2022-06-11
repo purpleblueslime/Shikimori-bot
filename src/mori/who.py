@@ -1,6 +1,7 @@
 import interactions
 from bot import bot
 from PIL import Image, ImageColor, ImageDraw, ImageFilter, ImageFont, ImageOps
+from numerize import numerize
 import textwrap
 import requests
 from io import BytesIO
@@ -111,9 +112,11 @@ async def who(ctx: interactions.CommandContext, sub_command: str, query: str=Non
     textWrap = Image.new('RGBA', (530,38), f'{inColor}F2')
     draw = ImageDraw.Draw(textWrap)
 
-    uname = textwrap.shorten(userNames[entry.user.id], width=18, placeholder='..')
+    uname = textwrap.shorten(userNames[entry.user.id], width=15, placeholder='..')
     draw.text((15, 38/2), uname, fill=textColor, font=font, anchor='lm')
-    draw.text((280, 38/2), entry.status.capitalize(), fill=textColor, font=font, anchor='lm')
+    if (entry.status) == 'CURRENT': entryProgress = f'~{numerize.numerize(entry.progress,1)}'
+    else: entryProgress = ''
+    draw.text((269, 38/2), f'{entry.status.capitalize()}{entryProgress}', fill=textColor, font=font, anchor='lm')
     draw.text((485, 38/2), str(entry.score), fill=textColor, font=font, anchor='rm')
     draw.text((485, 38/2), '\ue838', fill=textColor, font=fontIcon, anchor='lm')
 
@@ -126,18 +129,43 @@ async def who(ctx: interactions.CommandContext, sub_command: str, query: str=Non
   buffer = BytesIO()
   bannerImage.save(buffer, format='PNG', quality=90)
   buffer.seek(0)
-
-  if this.isAdult:
-    files = [interactions.File(f'SPOILER_who{itstype}.png', buffer)]
-    await ctx.send('<:RimuruWET:862571444617871360> **nsfw**', files=files) 
-  else: 
-    await ctx.send(files = [interactions.File(f'who{itstype}.png', buffer)])  
+  buffers = [buffer]
 
   if len(entries) > 7:
-    overflow = ''
-    for entry in entries[7:]:
-      overflow += f'**{userNames[entry.user.id]} / {entry.status.capitalize()} / {entry.score}**\n'
-    await ctx.send(f'{{\n{overflow}}}')  
+    overflowEntries = entries[7:]
+    overflowImage = Image.new('RGBA', (530, 38*len(overflowEntries)), (0,0,0,0))
+
+    yAxis = 0
+    for entry in overflowEntries:
+      textWrap = Image.new('RGBA', (530,38), f'{inColor}F2')
+      draw = ImageDraw.Draw(textWrap)
+
+      uname = textwrap.shorten(userNames[entry.user.id], width=15, placeholder='..')
+      draw.text((15, 38/2), uname, fill=textColor, font=font, anchor='lm')
+      if (entry.status) == 'CURRENT': entryProgress = f'~{numerize.numerize(entry.progress,1)}'
+      else: entryProgress = ''
+      draw.text((269, 38/2), f'{entry.status.capitalize()}{entryProgress}', fill=textColor, font=font, anchor='lm')
+      draw.text((485, 38/2), str(entry.score), fill=textColor, font=font, anchor='rm')
+      draw.text((485, 38/2), '\ue838', fill=textColor, font=fontIcon, anchor='lm')
+
+      overflowImage.paste(textWrap, (0,yAxis), textWrap)
+      yAxis += 38
+
+    buffer = BytesIO()
+    overflowImage.save(buffer, format='PNG', quality=90)
+    buffer.seek(0)
+    buffers.append(buffer)
+
+  if this.isAdult:
+    files = []
+    for buffer in buffers:
+      files.append(interactions.File(f'SPOILER_who{itstype}.png', buffer))
+    await ctx.send(':RimuruWET: **nsfw**', files=files) 
+  else: 
+    files = []
+    for buffer in buffers:
+      files.append(interactions.File(f'who{itstype}.png', buffer))
+    await ctx.send(files=files)  
 
 @bot.autocomplete('who', 'query')
 async def autoComplete(ctx: interactions.CommandContext, query: str = 'shikimori is not just a cutie'):
