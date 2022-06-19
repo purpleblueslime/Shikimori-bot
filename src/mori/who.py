@@ -160,7 +160,7 @@ async def who(ctx: interactions.CommandContext, sub_command: str, query: str=Non
     files = []
     for buffer in buffers:
       files.append(interactions.File(f'SPOILER_who{itstype}.png', buffer))
-    await ctx.send(':RimuruWET: **nsfw**', files=files) 
+    await ctx.send('<:RimuruWET:862571444617871360> **nsfw**', files=files) 
   else: 
     files = []
     for buffer in buffers:
