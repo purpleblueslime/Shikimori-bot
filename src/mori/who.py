@@ -143,6 +143,7 @@ async def who(ctx: interactions.CommandContext, sub_command: str, query: str=Non
       uname = textwrap.shorten(userNames[entry.user.id], width=15, placeholder='..')
       draw.text((15, 38/2), uname, fill=textColor, font=font, anchor='lm')
       if (entry.status) == 'CURRENT': entryProgress = f'~{numerize.numerize(entry.progress,1)}'
+      if (entry.status) == 'REPEATING': entryProgress = f'~{numerize.numerize(entry.progress,1)}'
       else: entryProgress = ''
       draw.text((269, 38/2), f'{entry.status.capitalize()}{entryProgress}', fill=textColor, font=font, anchor='lm')
       draw.text((485, 38/2), str(entry.score), fill=textColor, font=font, anchor='rm')
